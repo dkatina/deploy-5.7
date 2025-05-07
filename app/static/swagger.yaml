@@ -1,0 +1,240 @@
+swagger: '2.0'
+info:
+  title: "Mechanic API"
+  description: "API to manage a Mechanic Workshop"
+  version: "1.0.0"
+host: "127.0.0.1:5000"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+securityDefinitions:
+  bearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+
+
+paths:
+  /mechanics/login: #endpoint
+    post: #reaquest type
+      tags:
+        - Mechanics
+      summary: Mechanic Login (generate token)
+      description: Post login credentials (email and password), if valid a user specific token will be minted and returned.
+      parameters:
+        - in: body
+          name: body
+          description: Login Credentials
+          required: true
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Successful Login
+          schema: 
+            type: object
+            properties:
+              token:
+                type: string
+          examples:
+            application/json:
+              token: "eyJhbGciOiJIUzI1Ni..."
+
+  /mechanics: #endpoint
+    post: #reaquest type
+      tags:
+        - Mechanics
+      summary: Create a Mechanic
+      description: Send a JSON payload including mechanic information to create a new mechanic in the database.
+      parameters:
+        - in: body
+          name: body
+          description: Information of mechanic to be created.
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicPayload'
+      responses:
+        201:
+          description: Successful Creation
+          schema: 
+            $ref: '#/definitions/MechanicResponse'
+          examples:
+            application/json:
+              email: "johndoe@email.com"
+              id: 1
+              name: "John"
+              password: "who knows"
+              salary: 10000000000
+              tickets: []
+    
+    get: #reaquest type
+      tags:
+        - Mechanics
+      summary: Get Mechanics
+      description: Endpoint to return all mechanics
+      responses:
+        200:
+          description: Successful Retrieval
+          schema: 
+            $ref: '#/definitions/MechanicListResponse'
+
+    put: #reaquest type
+      tags:
+        - Mechanics
+      summary: Update a Mechanic (Token Required)
+      description: Update an Existing Mechanic, requires that mechanic to be logged in.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          description: Information used to update mechanic.
+          required: true
+          schema:
+            $ref: '#/definitions/MechanicPayload'
+      responses:
+        200:
+          description: Successful Update
+          schema: 
+            $ref: '#/definitions/MechanicResponse'
+          examples:
+            application/json:
+              email: "johndoe@email.com"
+              id: 1
+              name: "John"
+              password: "who knows"
+              salary: 10000000000
+              tickets: []
+
+  /customers/{id}:
+    get:
+      tags:
+        - Customers
+      summary: Endpoint to get Customer by ID
+      description: Pass customer ID as a path Parameter and recieve associated customer
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The user ID
+      responses:
+        200:
+          description: Successful Retrieval
+          schema:
+            $ref: '#/definitions/CustomerResponse' 
+
+  /customers/search:
+    get:
+      tags:
+        - Customers
+      summary: Endpoint to get Customer by Email
+      description: Pass customer email as a query parameter and recieve associated customer.
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+          description: Customer Email
+      responses:
+        200:
+          description: Successful Search
+          schema:
+            $ref: '#/definitions/CustomerListResponse'
+
+          
+
+
+
+definitions: 
+
+  MechanicPayload:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      salary:
+        type: integer
+    
+  MechanicResponse:
+    type: object
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      salary:
+        type: integer
+      tickets:
+        type: array
+        items:
+          type: integer
+
+  MechanicListResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        password:
+          type: string
+        salary:
+          type: integer
+        tickets:
+          type: array
+          items:
+            type: integer
+
+  CustomerResponse:
+    type: object
+    properties:
+      email: 
+        type: string
+      id: 
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+        
+  CustomerListResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        email: 
+          type: string
+        id: 
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+          
+      
+
+
